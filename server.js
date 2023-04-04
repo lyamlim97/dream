@@ -1,7 +1,13 @@
 import * as dotenv from "dotenv";
-dotenv.config();
 
 import { Configuration, OpenAIApi } from "openai";
+import path, { dirname } from "path";
+
+import cors from "cors";
+import express from "express";
+import { fileURLToPath } from "url";
+
+dotenv.config();
 
 const configuration = new Configuration({
     apiKey: process.env.OPENAI,
@@ -9,12 +15,23 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-import express from "express";
-import cors from "cors";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.get("/", function (req, res) {
+    res.sendFile(path.join(__dirname, "client", "index.html"));
+});
+
+app.get("/style.css", function (req, res) {
+    res.sendFile(path.join(__dirname, "client", "style.css"));
+});
+
+app.get("/main.js", function (req, res) {
+    res.sendFile(path.join(__dirname, "client", "main.js"));
+});
 
 app.post("/dream", async (req, res) => {
     try {
